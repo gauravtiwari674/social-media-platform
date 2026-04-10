@@ -1,0 +1,34 @@
+package com.socialmedia.auth;
+
+public class AuthResponse {
+
+    private String message;
+    private String username;
+
+    // Constructors
+    public AuthResponse() {
+    	
+    }
+
+    public AuthResponse(String message, String username) {
+        this.message = message;
+        this.username = username;
+    }
+
+    // Getter & Setter
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+}
