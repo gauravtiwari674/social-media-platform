@@ -1,7 +1,0 @@
-package com.socialmedia.friendship.Controller;
-
-public class FriendshipController {
-public String friend() {
-	return "Hi";
-}
-}
