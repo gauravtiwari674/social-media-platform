@@ -1,17 +1,17 @@
 package com.socialmedia.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Random;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.socialmedia.entity.Notification;
 import com.socialmedia.entity.User;
 import com.socialmedia.repository.NotificationRepository;
 import com.socialmedia.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-
+// Service class for handling notification-related business logic
 @Service
 public class NotificationService {
 

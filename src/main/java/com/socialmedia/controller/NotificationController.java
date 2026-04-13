@@ -1,12 +1,17 @@
 package com.socialmedia.controller;
 
-import com.socialmedia.entity.Notification;
-import com.socialmedia.service.NotificationService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.socialmedia.entity.Notification;
+import com.socialmedia.service.NotificationService;
+
+// Controller for handling notification-related endpoints
 @RestController
 @RequestMapping("/api/notifications")
 public class NotificationController {
