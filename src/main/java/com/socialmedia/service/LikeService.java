@@ -37,7 +37,6 @@ public class LikeService {
             Post post = postOpt.get();
             User user = userOpt.get();
 
-            // Check if already liked
             if (likeRepository.findByPostAndUser(post, user).isPresent()) {
                 return "Error: User already liked this post!";
             }

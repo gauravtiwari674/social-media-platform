@@ -22,11 +22,9 @@ public class Like {
     @Column(name = "timestamp")
     private LocalDateTime timestamp;
 
-    // Default Constructor
     public Like() {
     }
 
-    // Parameterized Constructor
     public Like(int likeID, Post post, User user, LocalDateTime timestamp) {
         this.likeID = likeID;
         this.post = post;
@@ -34,7 +32,6 @@ public class Like {
         this.timestamp = timestamp;
     }
 
-    // Getters and Setters
     public int getLikeID() {
         return likeID;
     }
