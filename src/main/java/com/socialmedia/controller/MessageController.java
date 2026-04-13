@@ -32,4 +32,3 @@ public class MessageController {
         return messageService.getConversation(user1ID, user2ID);
     }
 }
-
