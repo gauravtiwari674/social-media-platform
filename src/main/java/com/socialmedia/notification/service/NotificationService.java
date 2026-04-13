@@ -1,42 +1,41 @@
-package com.socialmedia.notification.service;
+package com.socialmedia.service;
 
-import com.socialmedia.notification.dto.NotificationDTO;
-import com.socialmedia.notification.entity.Notification;
-import com.socialmedia.notification.repository.NotificationRepository;
+import com.socialmedia.entity.Notification;
+import com.socialmedia.entity.User;
+import com.socialmedia.repository.NotificationRepository;
+import com.socialmedia.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class NotificationService {
 
-    @Autowired
-    private NotificationRepository notificationRepository;
+    private final NotificationRepository notificationRepository;
+    private final UserRepository userRepository;
 
-    @Async
-    public void sendNotification(int userID, String content) {
+    @Autowired
+    public NotificationService(NotificationRepository notificationRepository, UserRepository userRepository) {
+        this.notificationRepository = notificationRepository;
+        this.userRepository = userRepository;
+    }
+
+    public void createNotification(User user, String content) {
         Notification notification = new Notification();
-        notification.setUserID(userID);
+        // Generate a random ID for now since DB script doesn't have auto-increment
+        notification.setNotificationID(new Random().nextInt(1000000)); 
+        notification.setUser(user);
         notification.setContent(content);
         notification.setTimestamp(LocalDateTime.now());
         notificationRepository.save(notification);
     }
 
-    public List<NotificationDTO> getNotificationsForUser(int userID) {
-        return notificationRepository.findByUserIDOrderByTimestampDesc(userID)
-                .stream()
-                .map(n -> new NotificationDTO(
-                        n.getNotificationID(),
-                        n.getUserID(),
-                        n.getContent(),
-                        n.getTimestamp()))
-                .collect(Collectors.toList());
-    }
-
-    public void deleteNotification(int notificationID) {
-        notificationRepository.deleteById(notificationID);
+    public List<Notification> getNotificationsForUser(int userID) {
+        return notificationRepository.findByUser_UserIDOrderByTimestampDesc(userID);
     }
 }
+
