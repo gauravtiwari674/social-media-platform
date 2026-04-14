@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -42,5 +43,33 @@ public class UserService {
             }
         }
         throw new RuntimeException("Error: User not found!");
+    }
+
+     public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public User getUserById(int userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Error: User not found with ID: " + userId));
+    }
+
+    public User updateUser(int userId, User updatedUser) {
+        User existingUser = getUserById(userId);
+        existingUser.setUsername(updatedUser.getUsername());
+        existingUser.setEmail(updatedUser.getEmail());
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+            existingUser.setPassword(updatedUser.getPassword());
+        }
+        if (updatedUser.getProfilePicture() != null) {
+            existingUser.setProfilePicture(updatedUser.getProfilePicture());
+        }
+        return userRepository.save(existingUser);
+    }
+
+    public String deleteUser(int userId) {
+        User user = getUserById(userId);
+        userRepository.delete(user);
+        return "User deleted successfully!";
     }
 }
