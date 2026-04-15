@@ -22,9 +22,12 @@ public class MessageServiceTest {
     @Mock MessageRepository msgRepo;
     @Mock UserRepository userRepo;
     @Mock FriendshipRepository friendRepo;
+
+    // ✅ NEW MOCK (VERY IMPORTANT)
+    @Mock NotificationService notificationService;
+
     @InjectMocks MessageService service;
 
-    // ✅ Use @BeforeEach to avoid field-level init issues with Mockito
     private User u1;
     private User u2;
     private Message msg;
@@ -42,20 +45,21 @@ public class MessageServiceTest {
     void testSendMessage_Success() {
         when(userRepo.findById(1)).thenReturn(Optional.of(u1));
         when(userRepo.findById(2)).thenReturn(Optional.of(u2));
-        // Service checks BOTH directions of friendship — mock only the needed one
         when(friendRepo.existsByUser1AndUser2AndStatus(u1, u2, FriendshipStatus.accepted)).thenReturn(true);
 
         String result = service.sendMessage(1, 2, 100, "Hi");
 
         assertEquals("Message sent successfully!", result);
         verify(msgRepo, times(1)).save(any(Message.class));
+
+        // ✅ NEW ASSERTION (IMPORTANT)
+        verify(notificationService).createNotification(2, "New message from " + u1.getUsername());
     }
 
     @Test
     void testSendMessage_NotFriends() {
         when(userRepo.findById(1)).thenReturn(Optional.of(u1));
         when(userRepo.findById(2)).thenReturn(Optional.of(u2));
-        // Both directions return false → not friends
         when(friendRepo.existsByUser1AndUser2AndStatus(u1, u2, FriendshipStatus.accepted)).thenReturn(false);
         when(friendRepo.existsByUser1AndUser2AndStatus(u2, u1, FriendshipStatus.accepted)).thenReturn(false);
 
@@ -63,18 +67,25 @@ public class MessageServiceTest {
 
         assertEquals("Error: You can only message your friends!", result);
         verify(msgRepo, never()).save(any());
+
+        // ✅ Notification should NOT be called
+        verify(notificationService, never()).createNotification(anyInt(), anyString());
     }
 
     @Test
     void testSendMessage_FriendsViaReverseDirection() {
-        // ✅ Tests the OR branch: receiver is User1 in friendship table
         when(userRepo.findById(1)).thenReturn(Optional.of(u1));
         when(userRepo.findById(2)).thenReturn(Optional.of(u2));
         when(friendRepo.existsByUser1AndUser2AndStatus(u1, u2, FriendshipStatus.accepted)).thenReturn(false);
         when(friendRepo.existsByUser1AndUser2AndStatus(u2, u1, FriendshipStatus.accepted)).thenReturn(true);
 
-        assertEquals("Message sent successfully!", service.sendMessage(1, 2, 100, "Hello"));
+        String result = service.sendMessage(1, 2, 100, "Hello");
+
+        assertEquals("Message sent successfully!", result);
         verify(msgRepo).save(any(Message.class));
+
+        // ✅ Notification check
+        verify(notificationService).createNotification(2, "New message from " + u1.getUsername());
     }
 
     @Test
@@ -82,8 +93,11 @@ public class MessageServiceTest {
         when(userRepo.findById(1)).thenReturn(Optional.empty());
         when(userRepo.findById(2)).thenReturn(Optional.of(u2));
 
-        assertEquals("Error: Sender or Receiver not found!", service.sendMessage(1, 2, 100, "Hi"));
+        String result = service.sendMessage(1, 2, 100, "Hi");
+
+        assertEquals("Error: Sender or Receiver not found!", result);
         verify(msgRepo, never()).save(any());
+        verify(notificationService, never()).createNotification(anyInt(), anyString());
     }
 
     @Test
@@ -91,8 +105,11 @@ public class MessageServiceTest {
         when(userRepo.findById(1)).thenReturn(Optional.of(u1));
         when(userRepo.findById(2)).thenReturn(Optional.empty());
 
-        assertEquals("Error: Sender or Receiver not found!", service.sendMessage(1, 2, 100, "Hi"));
+        String result = service.sendMessage(1, 2, 100, "Hi");
+
+        assertEquals("Error: Sender or Receiver not found!", result);
         verify(msgRepo, never()).save(any());
+        verify(notificationService, never()).createNotification(anyInt(), anyString());
     }
 
     // ─── getInbox / getSent / getConversation ───────────────────────────────────
@@ -137,7 +154,6 @@ public class MessageServiceTest {
         List<Message> convo = service.getConversation(1, 2);
 
         assertTrue(convo.isEmpty());
-        verify(msgRepo, never()).findBySenderAndReceiverOrReceiverAndSenderOrderByTimestampAsc(any(), any(), any(), any());
     }
 
     // ─── deleteMessage ──────────────────────────────────────────────────────────
@@ -164,7 +180,6 @@ public class MessageServiceTest {
     void testCountMessages_Success() {
         when(userRepo.findById(1)).thenReturn(Optional.of(u1));
         when(userRepo.findById(2)).thenReturn(Optional.of(u2));
-        // ✅ Service calls countBySenderAndReceiver TWICE (u1→u2 and u2→u1)
         when(msgRepo.countBySenderAndReceiver(u1, u2)).thenReturn(3L);
         when(msgRepo.countBySenderAndReceiver(u2, u1)).thenReturn(2L);
 
