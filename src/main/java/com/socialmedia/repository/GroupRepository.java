@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+//Updated Group Repo
 @Repository
 public interface GroupRepository extends JpaRepository<SocialGroup, Integer> {
     List<SocialGroup> findByAdmin_UserID(int adminID);
