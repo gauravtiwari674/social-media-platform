@@ -54,4 +54,60 @@ public class CommentService {
     public List<Comment> getCommentsByPostId(int postID) {
         return commentRepository.findByPost_PostID(postID);
     }
+    
+    public List<Comment> getCommentsByPostAndUser(int postID, int userID) {
+        return commentRepository.findByPost_PostIDAndUser_UserID(postID, userID);
+    }
+    
+    public Comment getCommentById(int commentID) {
+        return commentRepository.findById(commentID)
+                .orElseThrow(() -> new RuntimeException("Comment not found!"));
+    }
+    
+    public List<Comment> getCommentsByUser(int userID) {
+        return commentRepository.findByUser_UserID(userID);
+    }
+    
+    public String deleteComment(int commentID) {
+        if (commentRepository.existsById(commentID)) {
+            commentRepository.deleteById(commentID);
+            return "Comment deleted successfully!";
+        } else {
+            return "Error: Comment not found!";
+        }
+    }
+    
+    public String updateComment(int commentID, Comment updatedComment) {
+        Optional<Comment> commentOpt = commentRepository.findById(commentID);
+
+        if (commentOpt.isPresent()) {
+            Comment comment = commentOpt.get();
+
+            comment.setCommentText(updatedComment.getCommentText());
+            comment.setTimestamp(java.time.LocalDateTime.now());
+
+            commentRepository.save(comment);
+            return "Comment updated successfully!";
+        }
+
+        return "Error: Comment not found!";
+    }
+    
+    public long getCommentCountByPost(int postID) {
+        return commentRepository.countByPost_PostID(postID);
+    }
+
+    public long getCommentCountByUser(int userID) {
+        return commentRepository.countByUser_UserID(userID);
+    }
+    
+    public String deleteCommentsByPost(int postID) {
+        commentRepository.deleteByPost_PostID(postID);
+        return "All comments for this post deleted!";
+    }
+
+    public String deleteCommentsByUser(int userID) {
+        commentRepository.deleteByUser_UserID(userID);
+        return "All comments of this user deleted!";
+    }
 }
