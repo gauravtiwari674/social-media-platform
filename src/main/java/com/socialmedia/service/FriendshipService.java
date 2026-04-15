@@ -188,6 +188,7 @@ public class FriendshipService {
                 .limit(10)
                 .toList();
     }
+        // Added Search Friends
     public List<User> searchFriends(int userID, String query) {
 
         if (query == null || query.trim().isEmpty()) {
