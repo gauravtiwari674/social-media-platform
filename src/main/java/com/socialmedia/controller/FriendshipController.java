@@ -87,8 +87,10 @@ public class FriendshipController {
         return ResponseEntity.ok(friendshipService.getMutualFriends(userID, targetID));
     }
 
-    @GetMapping("/{userID}/suggestions")
-    public ResponseEntity<List<User>> getFriendRecommendations(@PathVariable int userID) {
-        return ResponseEntity.ok(friendshipService.getFriendRecommendations(userID));
+    @GetMapping("/{userID}/search")
+    public ResponseEntity<List<User>> searchFriends(
+            @PathVariable int userID,
+            @RequestParam String query) {
+        return ResponseEntity.ok(friendshipService.searchFriends(userID, query));
     }
 }
