@@ -159,27 +159,13 @@ public class FriendshipService {
                 .toList();
     }
 
-    public List<User> getFriendRecommendations(int userID) {
-        // Find existing friends
-        List<Friendship> accepted = getFriendsList(userID);
-        
-        // Find pending requests
-        List<Friendship> pendingIncoming = getIncomingRequests(userID);
-        List<Friendship> pendingOutgoing = getOutgoingRequests(userID);
+    public List<User> searchFriends(int userID, String query) {
+        List<Friendship> friends = getFriendsList(userID);
+        String lowerQuery = query.toLowerCase();
 
-        List<Integer> excludedUserIDs = new java.util.ArrayList<>();
-        excludedUserIDs.add(userID); // Exclude self
-
-        // Add accepted friends to exclusion list
-        accepted.forEach(f -> excludedUserIDs.add(f.getUser1().getUserID() == userID ? f.getUser2().getUserID() : f.getUser1().getUserID()));
-        // Add pending relationships to exclusion list
-        pendingIncoming.forEach(f -> excludedUserIDs.add(f.getUser1().getUserID()));
-        pendingOutgoing.forEach(f -> excludedUserIDs.add(f.getUser2().getUserID()));
-
-        // Get all users, filter out excluded, and limit to 10 suggestions
-        return userRepository.findAll().stream()
-                .filter(u -> !excludedUserIDs.contains(u.getUserID()))
-                .limit(10)
+        return friends.stream()
+                .map(f -> f.getUser1().getUserID() == userID ? f.getUser2() : f.getUser1())
+                .filter(u -> u.getUsername().toLowerCase().contains(lowerQuery))
                 .toList();
     }
 }
