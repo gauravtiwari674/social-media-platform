@@ -41,6 +41,7 @@ public class UserController {
         return userService.getUserById(userId);
     }
      
+    // added user search endpoint
     @GetMapping("/username/{username}")
     public User getUserByUsername(@PathVariable String username) {
         return userService.getUserByUsername(username);
